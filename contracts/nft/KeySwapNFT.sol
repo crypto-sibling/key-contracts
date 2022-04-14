@@ -1715,8 +1715,10 @@ contract KeySwapNFT is ERC721A, Ownable {
 
     uint256 public _nftPrice = 0.5 ether; // NFT price in ETH
     uint256 public _maxSupply = 1000;
-    uint256 private _maxMintPerTx = 0;
-    uint256 private _maxPerWallet = 0;
+    uint256 public _maxMintPerTx = 0;
+    uint256 public _maxPerWallet = 0;
+
+    uint256 public _mintActiveTime = 1642766400; //(GMT): Friday, January 21, 2022 12:00:00 PM
 
     string private _base_uri;
     string private _unreveal_uri;
@@ -1737,6 +1739,7 @@ contract KeySwapNFT is ERC721A, Ownable {
             uint256 ownerTokenCount = balanceOf(_msgSender());
 
             require(!_paused, "Paused to mint");
+            require(block.timestamp >= _mintActiveTime, "Wait more");
             require(mintAmount_ > 0, "Invalid amount");
             require(
                 _maxMintPerTx == 0 || mintAmount_ <= _maxMintPerTx,
@@ -1809,6 +1812,14 @@ contract KeySwapNFT is ERC721A, Ownable {
      */
     function setMaxMintAmountPerTransaction(uint16 amount_) external onlyOwner {
         _maxMintPerTx = amount_;
+    }
+
+    /**
+     * @notice Set NFT active time
+     */
+    function setMintActiveTime(uint256 time_) external onlyOwner {
+        require(time_ > block.timestamp, "Invalid time");
+        _mintActiveTime = time_;
     }
 
     /**
